@@ -43,7 +43,6 @@ GitHub Actions (CI/CD)
 
 ---
 
-<img width="165" height="150" alt="mlops_architecture_diagram" src="https://github.com/user-attachments/assets/56221ad9-5aaa-47c8-9ff8-c07089180a94" />
 
 
 ## 🛠️ Tech Stack
