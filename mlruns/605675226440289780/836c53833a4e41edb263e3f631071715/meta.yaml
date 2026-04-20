@@ -1,0 +1,15 @@
+artifact_uri: /Users/lolaadriana/mlops-portfolio/mlruns/605675226440289780/836c53833a4e41edb263e3f631071715/artifacts
+end_time: 1776720891872
+entry_point_name: ''
+experiment_id: '605675226440289780'
+lifecycle_stage: active
+run_id: 836c53833a4e41edb263e3f631071715
+run_name: grandiose-midge-453
+run_uuid: 836c53833a4e41edb263e3f631071715
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1776720888679
+status: 3
+tags: []
+user_id: lolaadriana
