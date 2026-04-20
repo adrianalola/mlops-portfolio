@@ -1,0 +1,52 @@
+name: Deploy MLOps API
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ec2-user
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Instalar Docker si no está instalado
+          sudo yum install -y docker
+          sudo systemctl start docker
+
+          # Clonar o actualizar el repositorio
+          if [ -d "mlops-portfolio" ]; then
+            cd mlops-portfolio
+            git pull origin main
+          else
+            git clone https://github.com/adrianalola/mlops-portfolio.git
+            cd mlops-portfolio
+          fi
+
+          # Descargar modelo desde S3
+          sudo aws s3 cp s3://mlops-portfolio-models-2026/models/cancer_model.joblib model_artifacts/cancer_model.joblib
+          sudo aws s3 cp s3://mlops-portfolio-models-2026/models/feature_names.joblib model_artifacts/feature_names.joblib
+
+          # Construir y correr contenedor
+          sudo docker build -t mlops-cancer-api .
+          sudo docker stop mlops-api || true
+          sudo docker rm mlops-api || true
+          sudo docker run -d \
+            --name mlops-api \
+            --restart always \
+            -p 8000:8000 \
+            -e APP_ENV=production \
+            -e S3_BUCKET_NAME=mlops-portfolio-models-2026 \
+            -e AWS_DEFAULT_REGION=eu-central-1 \
+            mlops-cancer-api
+
+          echo "Deploy completado!"
