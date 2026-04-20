@@ -5,9 +5,25 @@ Demonstrates production-grade ML infrastructure for a breast cancer classificati
 
 ---
 
+## 📋 Table of Contents
+
+1. [Architecture](#-architecture)
+2. [Tech Stack](#-tech-stack)
+3. [Project Structure](#-project-structure)
+4. [Quick Start](#-quick-start)
+5. [API Endpoints](#-api-endpoints)
+6. [Experiment Tracking with MLflow](#-experiment-tracking-with-mlflow)
+7. [AWS Infrastructure](#-aws-infrastructure)
+8. [CI/CD Pipeline](#-cicd-pipeline)
+9. [Model Performance](#-model-performance)
+10. [Roadmap & Future Improvements](#-roadmap--future-improvements)
+11. [Author](#-author)
+
+---
+
 ## 🏗️ Architecture
 
-\`\`\`
+```
 GitHub Actions (CI/CD)
         │
         ▼
@@ -22,9 +38,13 @@ GitHub Actions (CI/CD)
         ▼
   scikit-learn Model
   (tracked with MLflow)
-\`\`\`
+```
+
 
 ---
+
+<img width="165" height="150" alt="mlops_architecture_diagram" src="https://github.com/user-attachments/assets/56221ad9-5aaa-47c8-9ff8-c07089180a94" />
+
 
 ## 🛠️ Tech Stack
 
@@ -43,7 +63,7 @@ GitHub Actions (CI/CD)
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 mlops-portfolio/
 ├── app/
 │   ├── main.py          # FastAPI application
@@ -62,47 +82,47 @@ mlops-portfolio/
 ├── Dockerfile
 ├── requirements.txt
 └── README.md
-\`\`\`
+```
 
 ---
 
 ## 🚀 Quick Start
 
 ### 1. Clone the repository
-\`\`\`bash
+```bash
 git clone https://github.com/adrianalola/mlops-portfolio.git
 cd mlops-portfolio
-\`\`\`
+```
 
 ### 2. Create virtual environment
-\`\`\`bash
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-\`\`\`
+```
 
 ### 3. Train the model
-\`\`\`bash
+```bash
 python app/train.py
-\`\`\`
+```
 
 ### 4. View experiment tracking
-\`\`\`bash
+```bash
 mlflow ui --port 5001
 # Open http://127.0.0.1:5001
-\`\`\`
+```
 
 ### 5. Run the API locally
-\`\`\`bash
+```bash
 uvicorn app.main:app --reload --port 8000
 # Open http://localhost:8000/docs
-\`\`\`
+```
 
 ### 6. Run with Docker
-\`\`\`bash
+```bash
 docker build -t mlops-cancer-api .
 docker run -p 8000:8000 mlops-cancer-api
-\`\`\`
+```
 
 ---
 
@@ -110,12 +130,12 @@ docker run -p 8000:8000 mlops-cancer-api
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | \`/health\` | Health check — model status |
-| GET | \`/info\` | Model metadata and features |
-| POST | \`/predict\` | Run inference |
+| GET | `/health` | Health check — model status |
+| GET | `/info` | Model metadata and features |
+| POST | `/predict` | Run inference |
 
 ### Example prediction request
-\`\`\`bash
+```bash
 curl -X POST "http://localhost:8000/predict" \
   -H "Content-Type: application/json" \
   -d '{
@@ -125,10 +145,10 @@ curl -X POST "http://localhost:8000/predict" \
                  0.03003, 0.006193, 25.38, 17.33, 184.6, 2019.0,
                  0.1622, 0.6656, 0.7119, 0.2654, 0.4601, 0.1189]
   }'
-\`\`\`
+```
 
 ### Example response
-\`\`\`json
+```json
 {
   "results": [{
     "prediction": 0,
@@ -139,7 +159,31 @@ curl -X POST "http://localhost:8000/predict" \
     }
   }]
 }
-\`\`\`
+```
+
+---
+
+## 📈 Experiment Tracking with MLflow
+
+All training runs are tracked locally with **MLflow** inside the `mlruns/` folder.
+
+Every time you run `python app/train.py` MLflow automatically records:
+
+| What | Example |
+|------|---------|
+| Parameters | n_estimators=100, max_depth=10, random_state=42 |
+| Metrics | accuracy=0.956, precision=0.959, recall=0.972, f1=0.965 |
+| Model artifact | sklearn pipeline saved |
+| Duration | 3.2s |
+| Source | train.py |
+
+To view the UI:
+```bash
+mlflow ui --port 5001
+# Open http://127.0.0.1:5001
+```
+
+To compare experiments, change a parameter in `train.py` and run it again — MLflow saves every run separately so you can see which parameters gave the best results.
 
 ---
 
@@ -153,27 +197,39 @@ Provisioned with Terraform:
 - **Security Group** — allows port 8000 (API) and 22 (SSH)
 
 ### Deploy infrastructure
-\`\`\`bash
+```bash
 cd infrastructure
 terraform init
 terraform apply
-\`\`\`
+```
 
 ### Destroy infrastructure (to avoid costs)
-\`\`\`bash
+```bash
 terraform destroy
-\`\`\`
+```
 
 ---
 
 ## 🔄 CI/CD Pipeline
 
-Every push to \`main\` automatically:
-1. Connects to EC2 via SSH
+Automated with **GitHub Actions** — workflow file at `.github/workflows/deploy.yml`
+
+Every push to `main` automatically:
+
+1. Connects to EC2 via SSH using stored secrets
 2. Pulls latest code from GitHub
 3. Downloads model artifacts from S3
-4. Builds Docker image
-5. Restarts container with zero downtime
+4. Builds fresh Docker image on the server
+5. Stops old container and starts new one with zero downtime
+
+Secrets required in GitHub repository settings:
+
+| Secret | Description |
+|--------|-------------|
+| `EC2_HOST` | Public IP of the EC2 instance |
+| `EC2_SSH_KEY` | Private SSH key to connect to EC2 |
+| `AWS_ACCESS_KEY_ID` | AWS credentials for CLI access |
+| `AWS_SECRET_ACCESS_KEY` | AWS credentials for CLI access |
 
 ---
 
@@ -188,12 +244,62 @@ Every push to \`main\` automatically:
 
 Dataset: [Breast Cancer Wisconsin](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html)
 — 569 samples, 30 features, binary classification (malignant/benign)
+<img width="1463" height="873" alt="Captura de pantalla 2026-04-20 a la(s) 23 39 42" src="https://github.com/user-attachments/assets/6c3e98ce-e74c-444e-ab4a-9aa5b68f8659" />
+
+
+---
+
+## 🗺️ Roadmap & Future Improvements
+
+This project is intentionally scoped to demonstrate core MLOps infrastructure skills.
+The following improvements reflect a natural evolution toward enterprise-grade MLOps.
+
+### ⚡ Short Term — Low/No Cost
+
+| Improvement | Description |
+|-------------|-------------|
+| **CloudWatch Integration** | Ship container logs to AWS CloudWatch for centralized monitoring and alerting |
+| **Model Versioning** | Tag MLflow runs with Git commit SHA to link every model version to its exact code |
+| **Input Data Validation** | Add stricter feature range checks and anomaly detection on incoming requests |
+| **Unit & Integration Tests** | Add pytest coverage for model loading, prediction logic, and API endpoints |
+| **Docker Multi-stage Build** | Reduce final image size by separating build and runtime stages |
+
+### 🚀 Medium Term — Moderate Complexity
+
+| Improvement | Description |
+|-------------|-------------|
+| **AWS ECR** | Push Docker images to Elastic Container Registry instead of building on EC2 directly |
+| **Application Load Balancer** | Add ALB in front of EC2 for HTTPS, health checks, and zero-downtime deploys |
+| **Auto Scaling Group** | Scale EC2 instances automatically based on API traffic |
+| **Feature Store** | Centralize and version input features using AWS Feature Store or Feast |
+| **Data Drift Detection** | Monitor incoming request distributions and alert when they diverge from training data |
+
+### 🏢 Enterprise Grade — AWS SageMaker
+
+> ⚠️ **Note:** SageMaker is the AWS-native MLOps platform used in production at scale.
+> It is intentionally excluded from this project due to cost — SageMaker endpoints,
+> notebooks, and pipelines are not covered by the AWS Free Tier.
+> The architecture below represents the next evolution of this project in a professional setting.
+
+| SageMaker Component | What It Replaces In This Project |
+|--------------------|----------------------------------|
+| **SageMaker Pipelines** | Manual `python train.py` + GitHub Actions training step |
+| **SageMaker Model Registry** | Local MLflow model tracking |
+| **SageMaker Endpoints** | FastAPI on EC2 |
+| **SageMaker Model Monitor** | Manual monitoring / no drift detection |
+| **SageMaker Feature Store** | Raw features passed directly to API |
+
+Migrating this project to SageMaker would be a natural next step in a production AWS environment and is part of the planned learning path for this portfolio.
 
 ---
 
 ## 👩‍💻 Author
 
-**Adriana** — Cloud & DevOps Engineer transitioning into MLOps
+**Adriana** — Cloud & DevOps Engineer transitioning into MLOps and QDevOps
+
+> Specializing in AWS, Azure, Docker, Kubernetes, Terraform, CI/CD pipelines and Quantum Computing
+> Background in Molecular Engineering 
+
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue)](https://linkedin.com/in/tu-perfil)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black)](https://github.com/adrianalola)
