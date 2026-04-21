@@ -41,6 +41,9 @@ GitHub Actions (CI/CD)
 ```
 
 
+<img width="873" height="701" alt="Captura de pantalla 2026-04-21 a la(s) 09 30 20" src="https://github.com/user-attachments/assets/fb3105a6-05ef-491c-a7f4-a3e4185bd71e" />
+
+
 ---
 
 
@@ -160,6 +163,9 @@ curl -X POST "http://localhost:8000/predict" \
 }
 ```
 
+
+<img width="621" height="334" alt="Captura de pantalla 2026-04-21 a la(s) 09 19 49" src="https://github.com/user-attachments/assets/593573aa-d37f-40f5-8617-a2c5b3635135" />
+
 ---
 
 ## 📈 Experiment Tracking with MLflow
@@ -183,6 +189,8 @@ mlflow ui --port 5001
 ```
 
 To compare experiments, change a parameter in `train.py` and run it again — MLflow saves every run separately so you can see which parameters gave the best results.
+
+<img width="1463" height="873" alt="Captura de pantalla 2026-04-20 a la(s) 23 39 42" src="https://github.com/user-attachments/assets/6c3e98ce-e74c-444e-ab4a-9aa5b68f8659" />
 
 ---
 
@@ -243,7 +251,7 @@ Secrets required in GitHub repository settings:
 
 Dataset: [Breast Cancer Wisconsin](https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html)
 — 569 samples, 30 features, binary classification (malignant/benign)
-<img width="1463" height="873" alt="Captura de pantalla 2026-04-20 a la(s) 23 39 42" src="https://github.com/user-attachments/assets/6c3e98ce-e74c-444e-ab4a-9aa5b68f8659" />
+
 
 
 ---
@@ -252,6 +260,9 @@ Dataset: [Breast Cancer Wisconsin](https://scikit-learn.org/stable/modules/gener
 
 This project is intentionally scoped to demonstrate core MLOps infrastructure skills.
 The following improvements reflect a natural evolution toward enterprise-grade MLOps.
+
+<img width="1059" height="709" alt="Captura de pantalla 2026-04-21 a la(s) 09 26 36" src="https://github.com/user-attachments/assets/59a8b9b0-bdb5-4a60-91fc-68c45aa7d864" />
+
 
 ### ⚡ Short Term — Low/No Cost
 
